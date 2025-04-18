@@ -164,9 +164,9 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
             ),
         ),
         EqInlineKeyboardButton(
-            "close" if close else "Back",
+            "ᴄʟᴏsᴇ 🍂" if close else "ʙᴀᴄᴋ 🔙",
             callback_data="close" if close else "settingsback_helper",
-        ),
+        )
         EqInlineKeyboardButton(
             "❯",
             callback_data="help_next({},{})".format(modulo_page + 1, int(close)),
@@ -181,7 +181,7 @@ async def paginate_modules(page_n, chat_id: int, close: bool = False):
         pairs.append(
             [
                 EqInlineKeyboardButton(
-                    "close" if close else "Back",
+                    "ᴄʟᴏsᴇ 🍂" if close else "ʙᴀᴄᴋ 🔙",
                     callback_data="close" if close else "settingsback_helper",
                 )
             ]
@@ -259,17 +259,17 @@ async def help_button(client, query):
         prev_page_num = int(mod_match.group(2))
         close = bool(int(mod_match.group(3)))
         text = (
-            f"<b><u>Here is the help for {HELPABLE[module].__MODULE__}:</u></b>\n"
+            f"<b><u>ʜᴇʀᴇ ɪꜱ ᴛʜᴇ ʜᴇʟᴘ ꜰᴏʀ{HELPABLE[module].__MODULE__}:</u></b>\n"
             + HELPABLE[module].__HELP__
         )
         key = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        text="↪️ Back",
+                        text="ʙᴀᴄᴋ 🔙",
                         callback_data=f"help_prev({prev_page_num},{int(close)})",
                     ),
-                    InlineKeyboardButton(text="🔄 Close", callback_data="close"),
+                    InlineKeyboardButton(text="ᴄʟᴏsᴇ 🍂", callback_data="close"),
                 ],
             ]
         )
@@ -308,9 +308,9 @@ async def help_button(client, query):
             [
                 [
                     InlineKeyboardButton(
-                        text="↪️ Back", callback_data=f"help_prev({page_n},{int(close)})"
+                        text="ʙᴀᴄᴋ 🔙", callback_data=f"help_prev({page_n},{int(close)})"
                     ),
-                    InlineKeyboardButton(text="🔄 Close", callback_data="close"),
+                    InlineKeyboardButton(text="ᴄʟᴏsᴇ 🍂", callback_data="close"),
                 ]
             ]
         )
