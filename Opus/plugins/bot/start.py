@@ -198,37 +198,18 @@ async def start_comm(client, message: Message, _):
                     config.LOGGER_ID,
                     f"{message.from_user.mention} Has just started bot ot check <code> Video information  </code>\n\n**User Id:** {sender_id}\n**User Name** {sender_name}",
                 )
-    else:
-        try:
-            await app.resolve_peer(OWNER_ID[0])
-            OWNER = OWNER_ID[0]
-        except Exception:
-            OWNER = None
-        out = private_panel(_, app.username)
-        if config.START_IMG_URL:
-            try:
-                await message.reply_photo(
-                    photo=config.START_IMG_URL,
-                    caption=_["start_1"].format(app.mention),
+            else:
+                out = private_panel(_)
+                await message.reply(
+                    text=_["start_2"].format(message.from_user.mention, app.mention),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
-            except Exception:
-                await message.reply_text(
-                    text=_["start_1"].format(app.mention),
-                    reply_markup=InlineKeyboardMarkup(out),
-                )
-        else:
-            await message.reply_text(
-                text=_["start_1"].format(app.mention),
-                reply_markup=InlineKeyboardMarkup(out),
-            )
-        if await is_on_off(config.LOG):
-            sender_id = message.from_user.id
-            sender_name = message.from_user.first_name
-            return await app.send_message(
-                config.LOGGER_ID,
-                f"{message.from_user.mention} Has started bot. \n\n**User id :** {sender_id}\n**User name:** {sender_name}",
-            )
+                if await is_on_off(2):
+                    return await app.send_message(
+                        chat_id=config.LOGGER_ID,
+                        text=f"<blockquote><b>» <a href='https://t.me/{message.from_user.username}'>ᴜsᴇʀ</a> ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.</b>\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code></blockquote>",
+                        disable_web_page_preview=True
+                    )
 
 
 @app.on_message(command("START_COMMAND") & filters.group & ~BANNED_USERS)
