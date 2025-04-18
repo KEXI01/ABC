@@ -8,7 +8,7 @@ from Opus.utils.formatters import time_to_seconds
 def get_progress_bar(percentage):
     umm = math.floor(percentage)
 
-        if 0 < umm <= 10:
+    if 0 < umm <= 10:
         return "⊚—————————"
     elif 10 < umm <= 20:
         return "—⊚————————"
