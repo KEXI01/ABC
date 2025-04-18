@@ -36,120 +36,29 @@ from Opus.utils.inline import private_panel, start_pannel
 loop = asyncio.get_running_loop()
 
 
-@app.on_message(command("START_COMMAND") & filters.private & ~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
-async def start_comm(client, message: Message, _):
-    chat_id = message.chat.id
+async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
-            keyboard = await paginate_modules(0, chat_id, close=True)
-
-            if config.START_IMG_URL:
-                return await message.reply_photo(
-                    photo=START_IMG_URL,
-                    caption=_["help_1"],
-                    reply_markup=keyboard,
-                )
-            else:
-                return await message.reply_text(
-                    text=_["help_1"],
-                    reply_markup=keyboard,
-                )
-        if name[0:4] == "song":
-            await message.reply_text(_["song_2"])
-            return
-        if name == "mkdwn_help":
-            await message.reply(
-                MARKDOWN,
-                parse_mode=ParseMode.HTML,
-                disable_web_page_preview=True,
+            keyboard = help_pannel(_)
+            return await message.reply(
+                text=_["help_1"].format(config.SUPPORT_CHAT),
+                reply_markup=keyboard,
             )
-        if name == "greetings":
-            await message.reply(
-                WELCOMEHELP,
-                parse_mode=ParseMode.HTML,
-                disable_web_page_preview=True,
-            )
-        if name[0:3] == "sta":
-            m = await message.reply_text("🔎 Fetching Your personal stats.!")
-            stats = await get_userss(message.from_user.id)
-            tot = len(stats)
-            if not stats:
-                await asyncio.sleep(1)
-                return await m.edit(_["ustats_1"])
-
-            def get_stats():
-                msg = ""
-                limit = 0
-                results = {}
-                for i in stats:
-                    top_list = stats[i]["spot"]
-                    results[str(i)] = top_list
-                    list_arranged = dict(
-                        sorted(
-                            results.items(),
-                            key=lambda item: item[1],
-                            reverse=True,
-                        )
-                    )
-                if not results:
-                    return m.edit(_["ustats_1"])
-                tota = 0
-                videoid = None
-                for vidid, count in list_arranged.items():
-                    tota += count
-                    if limit == 10:
-                        continue
-                    if limit == 0:
-                        videoid = vidid
-                    limit += 1
-                    details = stats.get(vidid)
-                    title = (details["title"][:35]).title()
-                    if vidid == "telegram":
-                        msg += f"🔗[Telegram Files and Audio]({config.SUPPORT_GROUP}) ** played {count} Times**\n\n"
-                    else:
-                        msg += f"🔗 [{title}](https://www.youtube.com/watch?v={vidid}) ** played {count} Times**\n\n"
-                msg = _["ustats_2"].format(tot, tota, limit) + msg
-                return videoid, msg
-
-            try:
-                videoid, msg = await loop.run_in_executor(None, get_stats)
-            except Exception as e:
-                print(e)
-                return
-            thumbnail = await Platform.youtube.thumbnail(videoid, True)
-            await m.delete()
-            await message.reply_photo(photo=thumbnail, caption=msg)
-            return
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
-            await asyncio.sleep(1)
-            if await is_on_off(config.LOG):
-                sender_id = message.from_user.id
-                sender_mention = message.from_user.mention
-                sender_name = message.from_user.first_name
+            if await is_on_off(2):
                 return await app.send_message(
-                    config.LOGGER_ID,
-                    f"{message.from_user.mention} Has just started bot to check <code>Sudolist </code>\n\n**User Id:** {sender_id}\n**User Name:** {sender_name}",
+                    chat_id=config.LOGGER_ID,
+                    text=f"<blockquote><b>» <a href='https://t.me/{message.from_user.username}'>ᴜsᴇʀ</a> ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ sᴜᴅᴏʟɪsᴛ</b>\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code></blockquote>",
+                    disable_web_page_preview=True
                 )
             return
-        if name[0:3] == "lyr":
-            query = (str(name)).replace("lyrics_", "", 1)
-            lyrical = config.lyrical
-            lyrics = lyrical.get(query)
-            if lyrics:
-                await Platform.telegram.send_split_text(message, lyrics)
-                return
-            else:
-                await message.reply_text("Failed to get lyrics ")
-                return
-        if name[0:3] == "del":
-            await del_plist_msg(client=client, message=message, _=_)
-            await asyncio.sleep(1)
         if name[0:3] == "inf":
-            m = await message.reply_text("🔎 Fetching info..")
+            m = await message.reply_text("🔎")
             query = (str(name)).replace("info_", "", 1)
             query = f"https://www.youtube.com/watch?v={query}"
             results = VideosSearch(query, limit=1)
@@ -162,54 +71,41 @@ async def start_comm(client, message: Message, _):
                 channel = result["channel"]["name"]
                 link = result["link"]
                 published = result["publishedTime"]
-            searched_text = f"""
-**ᴛʀᴀᴄᴋ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ**
-
-**❇️ ᴛɪᴛʟᴇ:** {title}
-
-**ᴅᴜʀᴀᴛɪᴏɴ:** {duration}
-**ᴠɪᴇᴡꜱ:** `{views}`
-**ᴘᴜʙʟɪꜱʜᴇᴅ ᴛɪᴍᴇꜱ:** {published}
-**ᴄʜᴀɴɴᴇʟ ɴᴀᴍᴇ:** {channel}
-**ᴄʜᴀɴɴᴇʟ ʟɪɴᴋ:** [ʟɪɴᴋ]({channellink})
-**ᴠɪᴅᴇᴏ ʟɪɴᴋ:** [ʟɪɴᴋ]({link})
-"""
+            searched_text = _["start_6"].format(
+                title, duration, views, published, channellink, channel, app.mention
+            )
             key = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(text="🎥 ᴡᴀᴛᴄʜ", url=f"{link}"),
-                        InlineKeyboardButton(text="🔄 ᴄʟᴏꜱᴇ", callback_data="close"),
+                        InlineKeyboardButton(text=_["S_B_8"], url=link),
+                        InlineKeyboardButton(text=_["S_B_9"], url=config.SUPPORT_CHAT),
                     ],
                 ]
             )
             await m.delete()
-            await app.send_photo(
-                message.chat.id,
-                photo=thumbnail,
-                caption=searched_text,
-                parse_mode=ParseMode.MARKDOWN,
+            await app.send_message(
+                chat_id=message.chat.id,
+                text=searched_text,
                 reply_markup=key,
             )
-            await asyncio.sleep(1)
-            if await is_on_off(config.LOG):
-                sender_id = message.from_user.id
-                sender_name = message.from_user.first_name
+            if await is_on_off(2):
                 return await app.send_message(
-                    config.LOGGER_ID,
-                    f"{message.from_user.mention} Has just started bot ot check <code> Video information  </code>\n\n**User Id:** {sender_id}\n**User Name** {sender_name}",
+                    chat_id=config.LOGGER_ID,
+                    text=f"<blockquote><b>» <a href='https://t.me/{message.from_user.username}'>ᴜsᴇʀ</a> ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code></blockquote>",
+                    disable_web_page_preview=True
                 )
-            else:
-                out = private_panel(_)
-                await message.reply(
-                    text=_["start_2"].format(message.from_user.mention, app.mention),
-                    reply_markup=InlineKeyboardMarkup(out),
-                )
-                if await is_on_off(2):
-                    return await app.send_message(
-                        chat_id=config.LOGGER_ID,
-                        text=f"<blockquote><b>» <a href='https://t.me/{message.from_user.username}'>ᴜsᴇʀ</a> ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.</b>\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code></blockquote>",
-                        disable_web_page_preview=True
-                    )
+    else:
+        out = private_panel(_)
+        await message.reply(
+            text=_["start_2"].format(message.from_user.mention, app.mention),
+            reply_markup=InlineKeyboardMarkup(out),
+        )
+        if await is_on_off(2):
+            return await app.send_message(
+                chat_id=config.LOGGER_ID,
+                text=f"<blockquote><b>» <a href='https://t.me/{message.from_user.username}'>ᴜsᴇʀ</a> ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.</b>\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code></blockquote>",
+                disable_web_page_preview=True
+            )
 
 
 @app.on_message(command("START_COMMAND") & filters.group & ~BANNED_USERS)
