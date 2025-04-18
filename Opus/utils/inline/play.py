@@ -8,27 +8,28 @@ from Opus.utils.formatters import time_to_seconds
 def get_progress_bar(percentage):
     umm = math.floor(percentage)
 
-    if 0 < umm <= 10:
-        bar = "⊚—————————"
-    elif 10 < umm < 20:
-        bar = "—⊚————————"
-    elif 20 <= umm < 30:
-        bar = "——⊚———————"
-    elif 30 <= umm < 40:
-        bar = "———⊚——————"
-    elif 40 <= umm < 50:
-        bar = "————⊚—————"
-    elif 50 <= umm < 60:
-        bar = "—————⊚————"
-    elif 60 <= umm < 70:
-        bar = "——————⊚———"
-    elif 70 <= umm < 80:
-        bar = "———————⊚——"
-    elif 80 <= umm < 95:
-        bar = "————————⊚—"
+        if 0 < umm <= 10:
+        return "⊚—————————"
+    elif 10 < umm <= 20:
+        return "—⊚————————"
+    elif 20 < umm <= 30:
+        return "——⊚———————"
+    elif 30 < umm <= 40:
+        return "———⊚——————"
+    elif 40 < umm <= 50:
+        return "————⊚—————"
+    elif 50 < umm <= 60:
+        return "—————⊚————"
+    elif 60 < umm <= 70:
+        return "——————⊚———"
+    elif 70 < umm <= 80:
+        return "———————⊚——"
+    elif 80 < umm <= 90:
+        return "————————⊚—"
+    elif 90 < umm <= 100:
+        return "—————————⊚"
     else:
-        bar = "—————————⊚"
-
+        return "——————————"
 
 def stream_markup_timer(_, videoid, chat_id, played, dur):
     played_sec = time_to_seconds(played)
@@ -44,18 +45,15 @@ def stream_markup_timer(_, videoid, chat_id, played, dur):
                 callback_data="GetTimer",
             )
         ],
-        [
-            InlineKeyboardButton(
-                text=_["P_B_7"], callback_data=f"add_playlist {videoid}"
-            ),
-        ],
         [            
             InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
             InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
             InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
         ],
         [InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
-         InlineKeyboardButton(text="ᴇɴᴅ 🍁", callback_data=f"ADMIN Stop|{chat_id}"),
+         InlineKeyboardButton(
+                text=_["P_B_7"], callback_data=f"add_playlist {videoid}"
+            ),
         ],
     ]
     return buttons
