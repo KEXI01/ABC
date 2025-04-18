@@ -56,8 +56,8 @@ async def init():
     await idle()
     await app.stop()
     await userbot.stop()
+    LOGGER("Opus").info("Stopping Opus Music Bot...")
 
 
 if __name__ == "__main__":
-    app.run(init())
-    LOGGER("Opus").info("Stopping Opus! GoodBye")
+    asyncio.get_event_loop().run_until_complete(init())
