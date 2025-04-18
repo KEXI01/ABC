@@ -1,5 +1,5 @@
 import importlib
-
+import asyncio
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
 
