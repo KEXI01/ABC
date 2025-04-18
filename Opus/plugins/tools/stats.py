@@ -11,7 +11,8 @@ from pytgcalls.__version__ import __version__ as pytgver
 import config
 from Opus import app
 from Opus.core.userbot import assistants
-from Opus.misc import SUDOERS, mongodb
+from Opus.misc import SUDOERS
+from Opus.misc import pymongodb as mongodb
 from Opus.plugins import ALL_MODULES
 from Opus.utils.database import get_served_chats, get_served_users, get_sudoers
 from Opus.utils.decorators.language import language, languageCB
